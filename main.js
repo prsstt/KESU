@@ -19,6 +19,7 @@ function createWindow() {
     backgroundColor: '#0a0a0c',
     frame: false,
     autoHideMenuBar: true,
+    icon: path.join(__dirname, 'build', 'icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
