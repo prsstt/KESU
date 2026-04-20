@@ -1,4 +1,4 @@
-# KESU Studio
+# KESU
 
 Professional Discord Message Manager. A powerful, frameless Electron application designed to seamlessly manage and erase your Discord message history across servers and direct messages.
 

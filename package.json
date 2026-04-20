@@ -15,7 +15,7 @@
     "electron-builder": "^26.8.1"
   },
   "build": {
-    "appId": "com.sh0cky.kesu",
+    "appId": "com.parasite.kesu",
     "productName": "Kesu",
     "win": {
       "target": "nsis"
@@ -23,7 +23,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "sh0cky",
+        "owner": "parasite",
         "repo": "kesu"
       }
     ]
