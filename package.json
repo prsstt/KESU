@@ -1,0 +1,31 @@
+{
+  "name": "kesu",
+  "version": "2.0.0",
+  "description": "Professional Discord Message Manager",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "electron": "^41.2.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.sh0cky.kesu",
+    "productName": "Kesu",
+    "win": {
+      "target": "nsis"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "sh0cky",
+        "repo": "kesu"
+      }
+    ]
+  }
+}

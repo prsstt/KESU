@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KESU Studio</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --sidebar-w: 240px;
+            --list-w: 320px;
+            --accent: #0070f3;
+            --danger: #ff3b30;
+            --text-main: #ffffff;
+            --text-dim: #88888b;
+            --border: rgba(255,255,255,0.08);
+            --card: #141417;
+            --hover: rgba(255,255,255,0.05);
+            --msg-bg: #1c1c1e;
+        }
+
+        body { 
+            margin: 0; padding: 0; background: var(--bg); color: var(--text-main); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            display: flex; height: 100vh; overflow: hidden;
+            -webkit-app-region: drag; 
+        }
+        
+        * { box-sizing: border-box; user-select: none; }
+
+        .nav-item, .list-item, .action-btn, .scroll-view, .console, .message-view, .modal-box, #login-screen, .search-box, .cb-outer, .win-btn, .chan-card, .setting-card, .switch, .dev-actions, .clear-btn, .preview-container, .channel-grid, .audit-list, .settings-container {
+            -webkit-app-region: no-drag;
+        }
+
+        /* Window Controls */
+        .window-controls {
+            position: absolute; top: 10px; right: 10px; z-index: 100;
+            display: flex; gap: 5px; -webkit-app-region: no-drag;
+        }
+        .win-btn { width: 36px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
+        .win-btn:hover { background: var(--hover); color: #fff; }
+        .win-btn.quit:hover { background: var(--danger); color: #fff; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-w); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 40px 15px 20px; }
+        .logo { font-size: 26px; font-weight: 800; padding: 0 15px; margin-bottom: 40px; letter-spacing: -1px; color: #fff; font-family: "Segoe UI", sans-serif; }
+        .nav-item { padding: 10px 15px; border-radius: 8px; cursor: pointer; color: var(--text-dim); transition: 0.2s; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+        .nav-item:hover { color: #fff; background: var(--hover); }
+        .nav-item.active { background: var(--card); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+        .global-purge-panel { padding: 20px 15px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); margin: 0 -15px -20px; }
+        .sel-count-text { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+        .sel-count-val { color: var(--accent); font-size: 14px; }
+        .clear-btn { background: transparent; border: none; cursor: pointer; color: var(--text-dim); font-size: 10px; transition: 0.2s; font-weight: 600; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; outline: none; }
+        .clear-btn:hover { color: var(--danger); background: rgba(255,59,48,0.1); }
+
+        /* List Panel */
+        .list-panel { width: var(--list-w); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .panel-title { padding: 40px 25px 15px; font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .search-box { margin: 0 15px 15px; padding: 10px 15px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; font-size: 13px; }
+        .search-box:focus { border-color: var(--accent); }
+
+        .scroll-view { flex: 1; overflow-y: auto; padding: 0 15px 30px; min-height: 0; }
+        
+        /* List Item with Checkbox */
+        .list-item { display: flex; align-items: center; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-bottom: 4px; font-size: 13px; color: var(--text-dim); }
+        .list-item:hover { background: var(--hover); color: #fff; }
+        .list-item.active-item { background: var(--card); color: #fff; border-left: 3px solid var(--accent); border-radius: 4px; }
+        
+        .cb-outer { display: flex; align-items: center; justify-content: center; padding: 5px; margin-right: 10px; cursor: pointer; }
+        .cb { width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 4px; transition: 0.2s; background: var(--bg); display: flex; align-items: center; justify-content: center; }
+        .cb.checked { background: var(--accent); border-color: var(--accent); }
+
+        .item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Workspace */
+        .workspace { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at top right, #161617, #0a0a0c); position: relative; min-width: 0; min-height: 0; }
+        
+        .view-container { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+        .view-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
+        .view-panel.active { display: flex; }
+
+        .header { padding: 40px; display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; }
+        .title-block h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .title-block p { margin: 8px 0 0; color: var(--text-dim); font-size: 13px; }
+        
+        .action-btn { background: var(--accent); color: #fff; border: none; padding: 12px 24px; border-radius: 99px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 112, 243, 0.3); outline: none; }
+        .action-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 112, 243, 0.4); }
+        .action-btn:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; transform: none; }
+        .action-btn.danger { background: var(--danger); box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2); }
+        .action-btn.danger:hover { box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4); }
+        .action-btn.ghost { background: transparent; border: 1px solid var(--border); box-shadow: none; color: var(--text-main); }
+        .action-btn.ghost:hover { background: var(--hover); }
+
+        /* Server Channels Grid */
+        .channel-grid { flex: 1; padding: 0 40px 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; align-content: start; overflow-y: auto; min-height: 0; }
+        .chan-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; font-size: 13px; }
+        .chan-card:hover { border-color: rgba(255,255,255,0.15); background: var(--hover); }
+        .chan-card.active { border-color: var(--accent); background: rgba(0, 112, 243, 0.05); }
+        .chan-card .cb { border-radius: 4px; }
+        .chan-card.active .cb { background: var(--accent); border-color: var(--accent); }
+        .preview-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; outline: none; }
+        .preview-btn:hover { background: var(--hover); color: #fff; }
+
+        /* Message Preview */
+        .preview-container { flex: 1; overflow-y: auto; padding: 20px; margin: 0 40px 20px; background: transparent; display: flex; flex-direction: column; gap: 15px; min-height: 0; }
+        .msg-bubble { background: var(--msg-bg); padding: 12px 18px; border-radius: 14px; border-bottom-left-radius: 4px; border: 1px solid var(--border); animation: fadeIn 0.3s ease; width: fit-content; max-width: 80%; flex-shrink: 0; }
+        .msg-time { font-size: 10px; color: var(--text-dim); margin-top: 6px; display: block; }
+
+        /* Settings View */
+        .settings-container { flex: 1; padding: 0 40px 20px; overflow-y: auto; min-height: 0; }
+        .setting-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Audit Log */
+        .audit-list { flex: 1; padding: 0 40px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+        .audit-item { background: var(--card); border: 1px solid var(--border); padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s ease; flex-shrink: 0; }
+        .audit-info { display: flex; flex-direction: column; gap: 4px; }
+        .audit-id { font-family: monospace; color: var(--text-dim); font-size: 11px; }
+        .audit-text { font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+        .audit-time { font-size: 11px; color: var(--danger); font-weight: 600; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Console */
+        .console { height: 140px; background: #000; border-top: 1px solid var(--border); padding: 15px 40px; font-family: "Fira Code", Consolas, monospace; font-size: 11px; color: #666; overflow-y: auto; display: none; flex-shrink: 0; }
+
+        /* Overlays & Modals */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; -webkit-app-region: no-drag; }
+        .modal-box { background: var(--card); border: 1px solid var(--border); padding: 40px; border-radius: 20px; width: 440px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; display: flex; flex-direction: column; }
+        .warning-text { font-size: 10px; color: #555; margin-top: 25px; line-height: 1.5; text-align: left; padding: 15px; background: #0a0a0c; border-radius: 8px; border: 1px solid #1a1a1c; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2c2c2e; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3a3c; }
+    </style>
+</head>
+<body>
+
+    <div class="window-controls">
+        <div class="win-btn" onclick="window.appControl.minimize()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+        <div class="win-btn" onclick="window.appControl.maximize()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+        </div>
+        <div class="win-btn quit" onclick="window.appControl.quit()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="overlay">
+        <div class="modal-box" style="justify-content: center;">
+            <h2 style="margin: 0 0 10px; font-size: 26px; letter-spacing: -0.5px;">KESU STUDIO</h2>
+            <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 30px;">Professional Workspace Initialization</p>
+            <button class="action-btn" id="btn-browser-login" style="width: 100%; padding: 14px;">Connect with Discord</button>
+            <div id="status-msg" style="margin-top: 15px; font-size: 12px; color: var(--accent);"></div>
+            
+            <div class="warning-text">
+                <strong>LEGAL & LIABILITY NOTICE:</strong><br>
+                The developers of KESU assume no responsibility for any consequences arising from the use of this software. Automating actions on user accounts violates Discord's Terms of Service. Using this application is entirely at your own risk.
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="overlay" style="display: none;">
+        <div class="modal-box">
+            <h2 style="margin: 0 0 10px; font-size: 22px;">Confirm Global Purge</h2>
+            <p style="color: var(--text-dim); font-size: 13px; line-height: 1.5; margin-bottom: 20px;">You are about to permanently erase your messages from the selected targets. This action <strong>cannot be undone</strong>.</p>
+            
+            <div style="background: #0a0a0c; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 25px; text-align: left; overflow-y: auto; flex: 1; max-height: 250px;">
+                <span style="font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 10px;">TARGETS TO BE PURGED:</span>
+                <div id="confirm-target-list" style="font-size: 12px; font-weight: 500; color: #ccc; line-height: 1.6;"></div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: auto;">
+                <button class="action-btn ghost" style="flex: 1;" onclick="document.getElementById('confirm-modal').style.display = 'none';">Cancel</button>
+                <button class="action-btn danger" style="flex: 1;" id="btn-confirm-purge">Yes, Erase</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Layout -->
+    <div class="sidebar">
+        <div class="logo">KESU</div>
+        <div class="nav-item active" data-view="dashboard">Audit Log</div>
+        <div class="nav-item" data-view="servers">Servers</div>
+        <div class="nav-item" data-view="dms">Direct Messages</div>
+        <div class="nav-item" data-view="settings">Settings</div>
+        <div style="flex: 1"></div>
+        
+        <div class="global-purge-panel">
+            <div class="sel-count-text">
+                <span>TARGETS SELECTED: <span class="sel-count-val" id="global-sel-count">0</span></span>
+                <button class="clear-btn" onclick="deselectAllTargets()">Clear All</button>
+            </div>
+            <button class="action-btn" id="btn-global-purge" style="width: 100%; padding: 12px; font-size: 12px;" disabled>Erase</button>
+            <button class="action-btn danger" id="btn-global-stop" style="width: 100%; padding: 12px; font-size: 12px; display: none;">STOP PROCESS</button>
+        </div>
+    </div>
+
+    <div class="list-panel">
+        <div class="panel-title">
+            <span id="list-header">OVERVIEW</span>
+        </div>
+        <input type="text" class="search-box" id="search-input" placeholder="Search..." autocomplete="off">
+        <div class="scroll-view" id="item-list">
+            <div style="padding: 15px; font-size: 13px; color: #444;">Please connect your account.</div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="view-container">
+            <!-- View: Empty (Default for unselected state) -->
+            <div id="view-empty" class="view-panel" style="align-items: center; justify-content: center; color: #444; font-size: 14px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.5" style="margin-bottom: 20px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Select an item from the list to display details.
+            </div>
+
+            <!-- View: Dashboard (Audit Log) -->
+            <div id="view-dashboard" class="view-panel active">
+                <div class="header">
+                    <div class="title-block">
+                        <h1>Audit Log</h1>
+                        <p>Chronological history of erasure actions across all targets.</p>
+                    </div>
+                </div>
+                <div class="audit-list" id="audit-list">
+                    <div style="text-align: center; color: #444; font-size: 13px; margin-top: 40px;">No actions recorded yet.</div>
+                </div>
+            </div>
+
+            <!-- View: Server Channels List -->
+            <div id="view-server" class="view-panel">
+                <div class="header">
+                    <div class="title-block">
+                        <h1 id="server-title">Server Name</h1>
+                        <p>Select text channels to include in the purge session.</p>
+                    </div>
+                </div>
+                <div class="channel-grid" id="server-channel-grid"></div>
+            </div>
+
+            <!-- View: Message Preview -->
+            <div id="view-preview" class="view-panel">
+                <div class="header">
+                    <div class="title-block">
+                        <h1 id="preview-title">Channel Name</h1>
+                        <p id="preview-context" style="color: var(--accent);">Context</p>
+                        <p style="margin-top: 4px;">Recent messages found from your account in this target.</p>
+                    </div>
+                </div>
+                <div class="preview-container" id="preview-messages"></div>
+            </div>
+
+            <!-- View: Settings -->
+            <div id="view-settings" class="view-panel">
+                <div class="header">
+                    <div class="title-block">
+                        <h1>Settings</h1>
+                        <p>Configure Studio preferences and developer tools.</p>
+                    </div>
+                </div>
+                <div class="settings-container">
+                    <div class="setting-card">
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Developer Mode</h3>
+                            <p style="margin: 5px 0 0; color: var(--text-dim); font-size: 13px;">Enable advanced logging console and diagnostic tools at the bottom of the screen.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-dev-mode">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="dev-actions" id="dev-tools" style="display: none; margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+                        <h3 style="margin: 0 0 15px; font-size: 14px; color: var(--accent);">Developer Actions</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="action-btn ghost" onclick="clearConsole()">Clear Console</button>
+                            <button class="action-btn ghost" onclick="showToken()">Reveal Token</button>
+                            <button class="action-btn ghost" onclick="testLog()">Test Log</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console (Developer Mode Only) -->
+        <div class="console" id="logs"></div>
+    </div>
+
+    <script>
+        let authToken = "";
+        let userData = null;
+        let currentNavView = "dashboard";
+        
+        let globalSelection = new Map(); 
+        let isPurging = false;
+        let stopRequested = false;
+        let auditHistory = []; 
+
+        // -- DEVELOPER MODE & CONSOLE --
+        const toggleDev = document.getElementById('toggle-dev-mode');
+        const consoleEl = document.getElementById('logs');
+        const devTools = document.getElementById('dev-tools');
+
+        toggleDev.onchange = (e) => {
+            if (e.target.checked) {
+                consoleEl.style.display = 'block';
+                devTools.style.display = 'block';
+                sysLog("Developer mode enabled.");
+            } else {
+                consoleEl.style.display = 'none';
+                devTools.style.display = 'none';
+            }
+        };
+
+        function clearConsole() {
+            consoleEl.innerHTML = "";
+            sysLog("Console cleared.");
+        }
+        function showToken() {
+            sysLog(`Current Token: ${authToken || 'Not authenticated'}`);
+        }
+        function testLog() {
+            sysLog("Diagnostic: This is a test log entry.");
+        }
+
+        const sysLog = (msg) => {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            consoleEl.appendChild(div);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        };
+
+        function addAuditRecord(msgId, content, targetName) {
+            const record = { id: msgId, text: content || "[Media/Embed]", target: targetName, time: new Date() };
+            auditHistory.unshift(record);
+            renderAuditLog();
+        }
+
+        function renderAuditLog() {
+            const container = document.getElementById('audit-list');
+            if (auditHistory.length === 0) return;
+            
+            container.innerHTML = "";
+            auditHistory.forEach(record => {
+                const div = document.createElement('div');
+                div.className = "audit-item";
+                div.innerHTML = `
+                    <div class="audit-info">
+                        <span class="audit-text">${record.text}</span>
+                        <span class="audit-id">ID: ${record.id} | Target: ${record.target}</span>
+                    </div>
+                    <span class="audit-time">${record.time.toLocaleTimeString()}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // -- LOGIN FLOW --
+        document.getElementById('btn-browser-login').onclick = () => {
+            document.getElementById('status-msg').textContent = "Waiting for Discord authentication...";
+            window.appControl.openLogin();
+        };
+
+        window.appControl.onTokenCaptured(async (token) => {
+            authToken = token;
+            sysLog("Verifying identity...");
+            try {
+                userData = await window.discordApi.fetchMe(token);
+                document.getElementById('login-screen').style.display = 'none';
+                sysLog(`Identity confirmed: ${userData.username}`);
+                document.querySelector('.nav-item[data-view="dms"]').click();
+            } catch(e) { 
+                sysLog("Verification failed."); 
+                document.getElementById('status-msg').textContent = "Verification failed. Try again.";
+            }
+        });
+
+        // -- SEARCH --
+        document.getElementById('search-input').oninput = filterList;
+        function filterList() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            document.querySelectorAll('.list-item').forEach(el => {
+                el.style.display = el.dataset.name.includes(q) ? "flex" : "none";
+            });
+        }
+
+        // -- NAVIGATION --
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.onclick = () => {
+                if(!authToken || isPurging) return;
+                document.querySelector('.nav-item.active').classList.remove('active');
+                item.classList.add('active');
+                currentNavView = item.dataset.view;
+                document.getElementById('search-input').value = "";
+                switchMainView(currentNavView);
+            };
+        });
+
+        function switchMainView(view) {
+            const listHeader = document.getElementById('list-header');
+            const list = document.getElementById('item-list');
+            
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+
+            if(view === "dashboard") {
+                document.getElementById('view-dashboard').classList.add('active');
+                listHeader.textContent = "GLOBAL AUDIT";
+                list.innerHTML = "<div style='padding:15px; color:#444; font-size:12px;'>View the global log of your actions here.</div>";
+                renderAuditLog();
+                return;
+            }
+
+            if(view === "settings") {
+                document.getElementById('view-settings').classList.add('active');
+                listHeader.textContent = "SETTINGS";
+                list.innerHTML = "<div style='padding:15px; color:#444; font-size:12px;'>Configure your workspace preferences.</div>";
+                return;
+            }
+
+            document.getElementById('view-empty').classList.add('active');
+            list.innerHTML = "<div style='padding:15px; color:#444; font-size:12px;'>Syncing...</div>";
+
+            if(view === "servers") {
+                listHeader.textContent = "SERVERS";
+                sysLog("[DEV] Requesting Guilds list from API...");
+                window.discordApi.fetchGuilds(authToken).then(g => {
+                    sysLog(`[DEV] Fetched ${g.length} guilds successfully.`);
+                    renderList(g, false);
+                }).catch(e => sysLog(`[ERROR] Failed to fetch servers: ${e.message || JSON.stringify(e)}`));
+            } else if(view === "dms") {
+                listHeader.textContent = "DIRECT MESSAGES";
+                sysLog("[DEV] Requesting DM channels from API...");
+                window.discordApi.fetchDMs(authToken).then(d => {
+                    sysLog(`[DEV] Fetched ${d.length} DM channels successfully.`);
+                    renderList(d, true);
+                }).catch(e => sysLog(`[ERROR] Failed to fetch DMs: ${e.message || JSON.stringify(e)}`));
+            }
+        }
+
+        function renderList(items, isDm) {
+            const list = document.getElementById('item-list');
+            list.innerHTML = "";
+            items.forEach(item => {
+                const name = isDm ? (item.name || (item.recipients && item.recipients[0] ? item.recipients[0].username : "Unknown")) : item.name;
+                
+                const div = document.createElement('div');
+                div.className = "list-item";
+                div.dataset.name = name.toLowerCase();
+
+                if (isDm) {
+                    const cbOuter = document.createElement('div');
+                    cbOuter.className = "cb-outer";
+                    const cb = document.createElement('div');
+                    cb.className = "cb";
+                    if(globalSelection.has(item.id)) cb.classList.add('checked');
+                    
+                    cbOuter.onclick = (e) => {
+                        if (isPurging) return;
+                        e.stopPropagation();
+                        if(globalSelection.has(item.id)) {
+                            globalSelection.delete(item.id);
+                            cb.classList.remove('checked');
+                            sysLog(`[DEV] Deselected DM: ${name}`);
+                        } else {
+                            globalSelection.set(item.id, { name: name, context: "Direct Message" });
+                            cb.classList.add('checked');
+                            sysLog(`[DEV] Selected DM: ${name}`);
+                        }
+                        updateGlobalPurgeBtn();
+                    };
+                    cbOuter.appendChild(cb);
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.className = "item-name";
+                    textSpan.textContent = name;
+                    
+                    div.appendChild(cbOuter);
+                    div.appendChild(textSpan);
+                    
+                    div.onclick = () => {
+                        if (isPurging) return;
+                        document.querySelectorAll('.list-item.active-item').forEach(e => e.classList.remove('active-item'));
+                        div.classList.add('active-item');
+                        sysLog(`[DEV] Opening preview for DM: ${name}`);
+                        openPreview(item.id, name, "Direct Message");
+                    };
+                } else {
+                    div.textContent = name;
+                    div.onclick = () => {
+                        if (isPurging) return;
+                        document.querySelectorAll('.list-item.active-item').forEach(e => e.classList.remove('active-item'));
+                        div.classList.add('active-item');
+                        sysLog(`[DEV] Opening server channels for: ${name}`);
+                        loadServerChannels(item.id, name);
+                    };
+                }
+                list.appendChild(div);
+            });
+            filterList();
+            
+            // If nothing is selected actively, ensure the empty view is shown
+            if (!document.querySelector('.list-item.active-item')) {
+                document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('view-empty').classList.add('active');
+            }
+        }
+
+        // -- SERVER CHANNELS --
+        async function loadServerChannels(guildId, guildName) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('view-server').classList.add('active');
+            
+            document.getElementById('server-title').textContent = guildName;
+            const grid = document.getElementById('server-channel-grid');
+            grid.innerHTML = "<div style='color:#444; font-size:13px; grid-column:1/-1;'>Mapping channels...</div>";
+            sysLog(`[DEV] Fetching channels for guild ID: ${guildId}`);
+            
+            try {
+                const chans = await window.discordApi.fetchChannels(authToken, guildId);
+                const textChans = chans.filter(c => c.type === 0);
+                sysLog(`[DEV] Found ${chans.length} total channels, ${textChans.length} text channels in ${guildName}.`);
+                grid.innerHTML = "";
+                
+                textChans.forEach(chan => {
+                    const card = document.createElement('div');
+                    card.className = "chan-card";
+                    if(globalSelection.has(chan.id)) card.classList.add('active');
+                    
+                    const nameStr = `# ${chan.name}`;
+                    
+                    card.innerHTML = `
+                        <div class="cb"></div>
+                        <span class="item-name">${nameStr}</span>
+                        <button class="preview-btn">Preview</button>
+                    `;
+                    
+                    card.onclick = (e) => {
+                        if (isPurging) return;
+                        if(e.target.tagName === 'BUTTON') {
+                            e.stopPropagation();
+                            sysLog(`[DEV] Opening preview for channel: ${nameStr}`);
+                            openPreview(chan.id, nameStr, guildName);
+                            return;
+                        }
+                        
+                        if(globalSelection.has(chan.id)) {
+                            globalSelection.delete(chan.id);
+                            card.classList.remove('active');
+                            sysLog(`[DEV] Deselected channel: ${nameStr}`);
+                        } else {
+                            globalSelection.set(chan.id, { name: nameStr, context: guildName });
+                            card.classList.add('active');
+                            sysLog(`[DEV] Selected channel: ${nameStr}`);
+                        }
+                        updateGlobalPurgeBtn();
+                    };
+                    grid.appendChild(card);
+                });
+            } catch(e) { 
+                sysLog(`Failed to map channels for ${guildName}.`); 
+                sysLog(`[ERROR] Channel map error: ${e.message || JSON.stringify(e)}`);
+            }
+        }
+
+        let currentPreviewChannel = null;
+        let previewLastMsgId = null;
+        let previewFoundCount = 0;
+        let previewScannedCount = 0;
+        let isLoadingPreview = false;
+        let previewAllLoaded = false;
+
+        // -- MESSAGE PREVIEW --
+        async function openPreview(channelId, channelName, context) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('view-preview').classList.add('active');
+            
+            document.getElementById('preview-title').textContent = channelName;
+            document.getElementById('preview-context').textContent = context;
+            const msgList = document.getElementById('preview-messages');
+            
+            currentPreviewChannel = channelId;
+            previewLastMsgId = null;
+            previewFoundCount = 0;
+            previewScannedCount = 0;
+            isLoadingPreview = false;
+            previewAllLoaded = false;
+            
+            msgList.innerHTML = `
+                <div style="text-align:center; padding: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); margin-bottom: 20px; flex-shrink: 0;" id="preview-header">
+                    <div style="color:var(--text-dim); font-size:12px; margin-bottom: 0;" id="preview-status">Ready to scan history.</div>
+                </div>
+                <div id="preview-content" style="display:flex; flex-direction:column; gap:15px; flex: 1;"></div>
+            `;
+            
+            msgList.onscroll = async () => {
+                if (msgList.scrollTop < 50 && !isLoadingPreview && !previewAllLoaded) {
+                    await loadMorePreview();
+                }
+            };
+            
+            // Auto-load the first batch
+            await loadMorePreview();
+            msgList.scrollTop = msgList.scrollHeight; // Scroll to bottom initially
+        }
+
+        async function loadMorePreview() {
+            if (!currentPreviewChannel || isLoadingPreview || previewAllLoaded) return;
+            isLoadingPreview = true;
+            
+            const statusEl = document.getElementById('preview-status');
+            const contentEl = document.getElementById('preview-content');
+            const msgList = document.getElementById('preview-messages');
+            
+            statusEl.textContent = "Scanning...";
+            
+            try {
+                const msgs = await window.discordApi.fetchMessages(authToken, currentPreviewChannel, previewLastMsgId);
+                
+                if (!msgs || msgs.length === 0) {
+                    statusEl.textContent = `End of history reached. Scanned ${previewScannedCount} msgs, found ${previewFoundCount} of yours.`;
+                    previewAllLoaded = true;
+                    if (previewFoundCount === 0) {
+                        contentEl.innerHTML = "<div style='color:#666; font-size:13px; text-align:center; padding: 20px;'>No messages found from you in the scanned history.</div>";
+                    }
+                    isLoadingPreview = false;
+                    return;
+                }
+
+                previewScannedCount += msgs.length;
+                previewLastMsgId = msgs[msgs.length - 1].id;
+                
+                const myMsgs = msgs.filter(m => m.author.id === userData.id);
+                previewFoundCount += myMsgs.length;
+                
+                if (myMsgs.length > 0) {
+                    if (contentEl.innerHTML.includes("No messages found")) {
+                        contentEl.innerHTML = "";
+                    }
+                    
+                    const oldScrollHeight = msgList.scrollHeight;
+                    const oldScrollTop = msgList.scrollTop;
+                    const frag = document.createDocumentFragment();
+                    
+                    myMsgs.reverse().forEach(m => {
+                        const div = document.createElement('div');
+                        div.className = "msg-bubble";
+                        const tempDiv = document.createElement('div');
+                        tempDiv.textContent = m.content || "[Media/Embed]";
+                        div.innerHTML = `<div>${tempDiv.innerHTML}</div><span class="msg-time">${new Date(m.timestamp).toLocaleString()}</span>`;
+                        frag.appendChild(div);
+                    });
+                    
+                    contentEl.prepend(frag);
+                    msgList.scrollTop = msgList.scrollHeight - oldScrollHeight + oldScrollTop;
+                }
+                
+                statusEl.textContent = `Scanned ${previewScannedCount} messages. Found ${previewFoundCount} of yours. Scroll up to scan more.`;
+                
+            } catch(e) {
+                if (e && e.status === 429) {
+                    const retry = e.response && e.response.data && e.response.data.retry_after ? e.response.data.retry_after : 5;
+                    statusEl.textContent = `Rate limit hit. Waiting ${retry}s...`;
+                    await new Promise(r => setTimeout(r, (retry + 0.5) * 1000));
+                } else {
+                    statusEl.innerHTML = "<span style='color:var(--danger);'>Error reading history. You may lack permissions.</span>";
+                    sysLog(`Error reading history for channel.`);
+                    previewAllLoaded = true;
+                }
+            }
+            
+            isLoadingPreview = false;
+            
+            // Fetch more automatically if we haven't filled the viewport
+            if (msgList.scrollHeight <= msgList.clientHeight + 50 && !previewAllLoaded) {
+                await loadMorePreview();
+            }
+        }
+
+        function deselectAllTargets() {
+            if (isPurging) return;
+            globalSelection.clear();
+            document.querySelectorAll('.cb.checked').forEach(cb => cb.classList.remove('checked'));
+            document.querySelectorAll('.chan-card.active').forEach(c => c.classList.remove('active'));
+            updateGlobalPurgeBtn();
+        }
+
+        // -- GLOBAL PURGE EXECUTION --
+        function updateGlobalPurgeBtn() {
+            const btn = document.getElementById('btn-global-purge');
+            document.getElementById('global-sel-count').textContent = globalSelection.size;
+            
+            if(globalSelection.size > 0) {
+                btn.disabled = false;
+                btn.textContent = `Erase ${globalSelection.size} Targets`;
+            } else {
+                btn.disabled = true;
+                btn.textContent = "Erase";
+            }
+        }
+
+        document.getElementById('btn-global-purge').onclick = () => {
+            const listDiv = document.getElementById('confirm-target-list');
+            listDiv.innerHTML = "";
+            globalSelection.forEach((info, id) => {
+                const d = document.createElement('div');
+                d.textContent = `- ${info.context} > ${info.name}`;
+                listDiv.appendChild(d);
+            });
+            document.getElementById('confirm-modal').style.display = 'flex';
+        };
+
+        document.getElementById('btn-confirm-purge').onclick = () => {
+            document.getElementById('confirm-modal').style.display = 'none';
+            startGlobalPurge();
+        };
+
+        document.getElementById('btn-global-stop').onclick = () => {
+            stopRequested = true;
+            document.getElementById('btn-global-stop').textContent = "STOPPING...";
+            sysLog("Halt issued. Waiting for current operation to abort...");
+        };
+
+        async function startGlobalPurge() {
+            isPurging = true;
+            stopRequested = false;
+            document.getElementById('btn-global-purge').style.display = 'none';
+            
+            const btnStop = document.getElementById('btn-global-stop');
+            btnStop.style.display = 'block';
+            btnStop.textContent = "STOP PROCESS";
+            
+            sysLog("GLOBAL PURGE INITIATED.");
+            
+            const targets = Array.from(globalSelection.entries());
+            
+            for (const [cid, info] of targets) {
+                if(stopRequested) break;
+                sysLog(`Sweeping: ${info.context} > ${info.name}`);
+                
+                let lastId = null;
+                let cCount = 0;
+                
+                while(!stopRequested) {
+                    try {
+                        const msgs = await window.discordApi.fetchMessages(authToken, cid, lastId);
+                        if (!msgs || msgs.length === 0) break;
+                        
+                        let foundMine = false;
+                        for (const m of msgs) {
+                            if (stopRequested) break;
+                            lastId = m.id;
+                            if (m.author.id === userData.id) {
+                                foundMine = true;
+                                try {
+                                    await window.discordApi.deleteMessage(authToken, cid, m.id);
+                                    cCount++;
+                                    sysLog(`ERASED: ${m.id}`);
+                                    addAuditRecord(m.id, m.content, `${info.context} > ${info.name}`);
+                                    await new Promise(r => setTimeout(r, 1000 + Math.random() * 800));
+                                } catch(e) {
+                                    if(e.status === 429) {
+                                        const retry = e.response.data.retry_after || 5;
+                                        sysLog(`Rate limit hit. Pausing for ${retry}s...`);
+                                        await new Promise(r => setTimeout(r, (retry + 0.5) * 1000));
+                                    } else {
+                                        sysLog(`Failed to delete msg ${m.id}. Skipping.`);
+                                    }
+                                }
+                            }
+                        }
+                    } catch(e) {
+                        sysLog(`Error reading history for ${info.name}. Moving to next target.`);
+                        break; 
+                    }
+                }
+                if (!stopRequested) {
+                    sysLog(`Finished sweeping ${info.name}. Erased ${cCount} records.`);
+                    // Optionally remove from selection if fully cleared
+                    globalSelection.delete(cid);
+                    updateGlobalPurgeBtn();
+                }
+            }
+            
+            sysLog("PURGE PROCESS CONCLUDED.");
+            isPurging = false;
+            document.getElementById('btn-global-stop').style.display = 'none';
+            document.getElementById('btn-global-purge').style.display = 'block';
+            updateGlobalPurgeBtn();
+        }
+    </script>
+</body>
+</html>
