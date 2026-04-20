@@ -1,9 +1,14 @@
 const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow = null;
 let loginWin = null;
 let filterActive = false;
+
+// Configure autoUpdater
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -87,7 +92,16 @@ ipcMain.on('open-login-window', () => {
   });
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  
+  // Check for updates silently on startup
+  try {
+    autoUpdater.checkForUpdatesAndNotify();
+  } catch (err) {
+    console.log("Auto-updater skipped during local development.");
+  }
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
@@ -95,4 +109,23 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('quit-app', () => {
   app.quit();
+});
+
+// Auto-updater event forwarders
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater-status', `Update v${info.version} available. Downloading...`);
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater-status', `Update v${info.version} downloaded. It will be installed on restart.`);
+  }
+});
+
+autoUpdater.on('error', (err) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater-status', 'Update check failed.');
+  }
 });
