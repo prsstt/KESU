@@ -1,6 +1,6 @@
 {
   "name": "kesu",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Professional Discord Message Manager",
   "main": "main.js",
   "scripts": {
@@ -20,13 +20,13 @@
     "productName": "Kesu",
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowElevation": true,
-      "requestedExecutionLevel": "requireAdministrator",
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,

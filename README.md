@@ -4,15 +4,17 @@ Professional Discord Message Manager. A powerful, frameless Electron application
 
 ## Features
 
-- **Global Audit Log:** Track and review a chronological history of all your erasure actions.
-- **Multi-Target Selection:** Select multiple servers, channels, and direct messages simultaneously for a unified wipe session.
-- **Deep Message Preview:** Reverse infinite scrolling allows you to preview your exact footprints in any selected channel before eradication.
-- **Developer Mode:** Advanced logging console integrated directly into the workspace for real-time diagnostics.
-- **Smart Rate Limiting:** Built-in delays and automatic handling of API rate limits (HTTP 429) ensure smooth and uninterrupted operation.
+- Global Audit Log: Track and review a chronological history of all your erasure actions.
+- Multi-Target Selection: Select multiple servers, channels, and direct messages simultaneously for a unified wipe session.
+- Deep Message Preview: Reverse infinite scrolling allows you to preview your exact footprints in any selected channel before eradication.
+- Native Media Support: View images, videos, and listen to audio files directly within the chat interface.
+- Advanced Message Selection: Select individual messages from any conversation for targeted removal.
+- Developer Mode: Advanced logging console integrated directly into the workspace for real-time diagnostics.
+- Smart Rate Limiting: Built-in delays and automatic handling of API rate limits ensure smooth operation.
 
 ## Installation
 
-Ensure you have [Node.js](https://nodejs.org/) installed.
+Ensure you have Node.js installed.
 
 1. Clone or download the repository.
 2. Install the necessary dependencies:
@@ -26,11 +28,11 @@ Ensure you have [Node.js](https://nodejs.org/) installed.
 
 ## Building Executables
 
-To build a standalone `.exe` installer for Windows:
+To build a standalone installer for Windows:
 ```bash
 npm run build
 ```
-The generated installer will be located in the `dist/` directory.
+The generated installer will be located in the dist directory.
 
 ## Liability Notice
 
