@@ -1,6 +1,6 @@
 {
   "name": "kesu",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Professional Discord Message Manager",
   "main": "main.js",
   "scripts": {
@@ -26,9 +26,13 @@
       "oneClick": false,
       "perMachine": false,
       "allowElevation": true,
+      "requestedExecutionLevel": "requireAdministrator",
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
       "license": "LICENSE"
     },
     "publish": [

@@ -112,6 +112,11 @@ ipcMain.on('quit-app', () => {
   app.quit();
 });
 
+ipcMain.on('open-external', (event, url) => {
+  const { shell } = require('electron');
+  shell.openExternal(url);
+});
+
 // Auto-updater event forwarders
 autoUpdater.on('update-available', (info) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
