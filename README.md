@@ -1,45 +1,78 @@
-# KESU - Professional Discord Message Manager
+# KESU
 
-KESU is a high-performance, frameless Electron application designed for the precise management and eradication of Discord message history. Built for efficiency and security, it provides a unified workspace for auditing and clearing digital footprints across servers and private conversations.
+> A professional, frameless Electron application for managing and erasing your Discord message history.
 
-## Core Features
+KESU is a powerful tool designed to give you full control over your digital footprint on Discord. It allows for seamless management and erasure of messages across servers and direct messages, all from a single, intuitive interface.
 
-- **Global Audit System:** Comprehensive real-time logging of all erasure actions for administrative review.
-- **Multi-Target Purge:** Ability to select and queue multiple servers, specific channels, and direct messages for simultaneous processing.
-- **Native Media Integration:** View images, play videos, and listen to audio attachments directly within the application using native playback interfaces.
-- **Granular Message Selection:** Select specific individual messages within a conversation for targeted removal without wiping the entire history.
-- **Intelligent Infinite Scroll:** Deep scanning of message history with reverse-loading capabilities to locate and preview specific footprints.
-- **Automated Rate Limiting:** Dynamic delay algorithms and automatic handling of Discord API rate limits (HTTP 429) to ensure account stability.
-- **Developer Workspace:** Integrated diagnostic console for real-time monitoring of API requests and system events.
+<!-- Add a screenshot or GIF of the application in action -->
+<!-- ![KESU Application Screenshot](link-to-your-screenshot.png) -->
+
+## Table of Contents
+
+- [Features](#features)
+- [Disclaimer](#disclaimer)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Building from Source](#building-from-source)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **Global Audit Log**: Track and review a chronological history of all your erasure actions.
+- **Multi-Target Selection**: Select multiple servers, channels, and direct messages simultaneously for a unified wipe session.
+- **Deep Message Preview**: Reverse infinite scrolling allows you to preview your exact footprints in any selected channel before eradication.
+- **Native Media Support**: View images, videos, and listen to audio files directly within the chat interface.
+- **Advanced Message Selection**: Select individual messages from any conversation for targeted removal.
+- **Developer Mode**: An advanced logging console is integrated directly into the workspace for real-time diagnostics.
+- **Smart Rate Limiting**: Built-in delays and automatic handling of API rate limits ensure smooth, uninterrupted operation.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+- [Node.js](https://nodejs.org/) (LTS version is recommended)
 
 ## Installation
 
-Operating Environment: Node.js 16.x or higher.
+### From Releases (Recommended)
 
-1. Clone or download the source repository.
-2. Execute the dependency installation:
-   ```bash
-   npm install
-   ```
-3. Initialize the application:
-   ```bash
-   npm start
-   ```
+The easiest way to get started is to download the latest pre-built installer for your operating system from the project's [**Releases page**](https://github.com/sh0cky/KESU/releases).
 
-## Production Deployment
+### From Source (For Developers)
 
-To generate a standalone Windows installer (.exe):
+If you prefer to build the application from source, follow these steps:
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/sh0cky/KESU.git
+    cd KESU
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Start the application**
+    ```bash
+    npm start
+    ```
+
+## Building from Source
+
+To build a standalone installer for Windows, run the following command from the project root:
 ```bash
 npm run build
 ```
-The compiled artifacts will be located in the `dist` directory.
+The generated installer will be located in the dist directory.
 
 ## Security and Compliance
 
 KESU utilizes secure token interception via network header monitoring, ensuring that sensitive credentials never leave the local environment. Data persistence is handled via isolated local storage.
 
-### Terms of Service Advisory
-The use of automation on Discord user accounts is a violation of their Terms of Service (self-botting). Users assume full responsibility for any administrative actions taken by Discord against their accounts. This software is provided for educational and administrative purposes without warranty.
+## Liability Notice
+
+_**The developers of KESU assume no responsibility for any consequences arising from the use of this software. Automating actions on user accounts may violates Discord's Terms of Service. Using this application is entirely at your own risk.**_
 
 ## License
 
