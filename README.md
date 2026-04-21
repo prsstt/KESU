@@ -1,43 +1,46 @@
-# KESU
+# KESU - Professional Discord Message Manager
 
-Professional Discord Message Manager. A powerful, frameless Electron application designed to seamlessly manage and erase your Discord message history across servers and direct messages.
+KESU is a high-performance, frameless Electron application designed for the precise management and eradication of Discord message history. Built for efficiency and security, it provides a unified workspace for auditing and clearing digital footprints across servers and private conversations.
 
-## Features
+## Core Features
 
-- Global Audit Log: Track and review a chronological history of all your erasure actions.
-- Multi-Target Selection: Select multiple servers, channels, and direct messages simultaneously for a unified wipe session.
-- Deep Message Preview: Reverse infinite scrolling allows you to preview your exact footprints in any selected channel before eradication.
-- Native Media Support: View images, videos, and listen to audio files directly within the chat interface.
-- Advanced Message Selection: Select individual messages from any conversation for targeted removal.
-- Developer Mode: Advanced logging console integrated directly into the workspace for real-time diagnostics.
-- Smart Rate Limiting: Built-in delays and automatic handling of API rate limits ensure smooth operation.
+- **Global Audit System:** Comprehensive real-time logging of all erasure actions for administrative review.
+- **Multi-Target Purge:** Ability to select and queue multiple servers, specific channels, and direct messages for simultaneous processing.
+- **Native Media Integration:** View images, play videos, and listen to audio attachments directly within the application using native playback interfaces.
+- **Granular Message Selection:** Select specific individual messages within a conversation for targeted removal without wiping the entire history.
+- **Intelligent Infinite Scroll:** Deep scanning of message history with reverse-loading capabilities to locate and preview specific footprints.
+- **Automated Rate Limiting:** Dynamic delay algorithms and automatic handling of Discord API rate limits (HTTP 429) to ensure account stability.
+- **Developer Workspace:** Integrated diagnostic console for real-time monitoring of API requests and system events.
 
 ## Installation
 
-Ensure you have Node.js installed.
+Operating Environment: Node.js 16.x or higher.
 
-1. Clone or download the repository.
-2. Install the necessary dependencies:
+1. Clone or download the source repository.
+2. Execute the dependency installation:
    ```bash
    npm install
    ```
-3. Start the application:
+3. Initialize the application:
    ```bash
    npm start
    ```
 
-## Building Executables
+## Production Deployment
 
-To build a standalone installer for Windows:
+To generate a standalone Windows installer (.exe):
 ```bash
 npm run build
 ```
-The generated installer will be located in the dist directory.
+The compiled artifacts will be located in the `dist` directory.
 
-## Liability Notice
+## Security and Compliance
 
-The developers of KESU assume no responsibility for any consequences arising from the use of this software. Automating actions on user accounts violates Discord's Terms of Service. Using this application is entirely at your own risk.
+KESU utilizes secure token interception via network header monitoring, ensuring that sensitive credentials never leave the local environment. Data persistence is handled via isolated local storage.
+
+### Terms of Service Advisory
+The use of automation on Discord user accounts is a violation of their Terms of Service (self-botting). Users assume full responsibility for any administrative actions taken by Discord against their accounts. This software is provided for educational and administrative purposes without warranty.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Distributed under the MIT License. See LICENSE for more information.
