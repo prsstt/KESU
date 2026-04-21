@@ -323,6 +323,14 @@
                         </label>
                     </div>
 
+                    <div class="setting-card" style="margin-top: 15px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Account Session</h3>
+                            <p style="margin: 5px 0 0; color: var(--text-dim); font-size: 13px;">Securely log out and clear all stored authentication data from this device.</p>
+                        </div>
+                        <button class="action-btn danger" id="btn-logout" style="padding: 10px 20px; font-size: 12px; box-shadow: none;">Logout</button>
+                    </div>
+
                     <div class="dev-actions" id="dev-tools" style="display: none; margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
                         <h3 style="margin: 0 0 15px; font-size: 14px; color: var(--accent);">Developer Actions</h3>
                         <div style="display: flex; gap: 10px;">
@@ -467,6 +475,52 @@
             consoleEl.appendChild(div);
             consoleEl.scrollTop = consoleEl.scrollHeight;
         };
+
+        // -- LOGOUT FUNCTION --
+        function logout() {
+            showModal(
+                "Confirm Logout",
+                "Are you sure you want to log out of Kesu? Your current session will be ended and cookies will be cleared.",
+                "ACTION:",
+                ["Clear local session", "Remove Discord cookies", "Return to login screen"],
+                async () => {
+                    sysLog("Logging out...");
+                    authToken = "";
+                    userData = null;
+                    localStorage.removeItem('authToken');
+                    
+                    // Reset UI State
+                    document.getElementById('login-screen').style.display = 'flex';
+                    document.getElementById('btn-browser-login').style.display = 'block';
+                    document.getElementById('status-msg').textContent = "Logged out successfully.";
+                    
+                    // Reset selection and views
+                    globalSelection.clear();
+                    selectedMessages.clear();
+                    updateGlobalPurgeBtn();
+                    
+                    // Reset sidebar view
+                    document.querySelectorAll('.nav-item').forEach(p => p.classList.remove('active'));
+                    document.querySelector('.nav-item[data-view="dashboard"]').classList.add('active');
+                    currentNavView = "dashboard";
+                    
+                    // Clear list
+                    document.getElementById('item-list').innerHTML = "<div style='padding: 15px; font-size: 13px; color: #444;'>Please connect your account.</div>";
+                    
+                    // Switch to empty view
+                    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById('view-empty').classList.add('active');
+
+                    // Clear Discord session in Electron to allow switching accounts
+                    if (window.appControl && window.appControl.clearSession) {
+                        window.appControl.clearSession();
+                    }
+                    
+                    sysLog("Session cleared.");
+                }
+            );
+        }
+        document.getElementById('btn-logout').onclick = logout;
 
         function addAuditRecord(msgId, content, targetName) {
             const record = { id: msgId, text: content || "[Media/Embed]", target: targetName, time: new Date() };

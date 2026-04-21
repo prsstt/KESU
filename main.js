@@ -55,7 +55,25 @@ ipcMain.on('open-login-window', () => {
     parent: mainWindow,
     modal: true,
     autoHideMenuBar: true,
-    webPreferences: { nodeIntegration: false }
+    webPreferences: { 
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  // Block WebAuthn to prevent "Insert Security Key" Windows prompt
+  loginWin.webContents.on('dom-ready', () => {
+    loginWin.webContents.executeJavaScript(`
+      if (window.navigator.credentials) {
+        const origGet = window.navigator.credentials.get;
+        window.navigator.credentials.get = function(options) {
+          if (options && options.publicKey) {
+            return Promise.reject(new DOMException("WebAuthn is disabled to prevent OS prompts.", "NotAllowedError"));
+          }
+          return origGet.call(window.navigator.credentials, options);
+        };
+      }
+    `);
   });
 
   loginWin.loadURL('https://discord.com/login');
@@ -115,6 +133,10 @@ ipcMain.on('quit-app', () => {
 ipcMain.on('open-external', (event, url) => {
   const { shell } = require('electron');
   shell.openExternal(url);
+});
+
+ipcMain.on('clear-session', () => {
+  session.defaultSession.clearStorageData();
 });
 
 // Auto-updater event forwarders

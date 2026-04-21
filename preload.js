@@ -45,5 +45,6 @@ contextBridge.exposeInMainWorld('appControl', {
     maximize: () => ipcRenderer.send('window-max'),
     openLogin: () => ipcRenderer.send('open-login-window'),
     openExternal: (url) => ipcRenderer.send('open-external', url),
+    clearSession: () => ipcRenderer.send('clear-session'),
     onTokenCaptured: (callback) => ipcRenderer.on('token-captured', (event, token) => callback(token))
 });
