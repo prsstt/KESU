@@ -115,7 +115,7 @@
         .msg-bubble.selected { border-color: var(--accent); background: rgba(0, 112, 243, 0.05); }
         .msg-time { font-size: 10px; color: var(--text-dim); margin-top: 6px; display: block; user-select: none; }
         
-        .msg-content { user-select: text; cursor: text; }
+        .msg-content { user-select: none; }
 
         /* Inline Media */
         .inline-media { margin-top: 10px; border-radius: 8px; overflow: hidden; background: #000; display: block; max-width: 400px; border: 1px solid var(--border); position: relative; }
@@ -901,7 +901,7 @@
                         div.innerHTML = `<div>${tempDiv.outerHTML}${mediaHtml}</div><span class="msg-time">${new Date(m.timestamp).toLocaleString()}</span>`;
                         
                         div.onclick = (e) => {
-                            if (e.target.tagName === 'VIDEO' || e.target.tagName === 'AUDIO' || e.target.classList.contains('media-download') || e.target.tagName === 'IMG' || e.target.closest('.audio-player-wrapper') || e.target.classList.contains('msg-content')) return;
+                            if (e.target.tagName === 'VIDEO' || e.target.tagName === 'AUDIO' || e.target.classList.contains('media-download') || e.target.tagName === 'IMG' || e.target.closest('.audio-player-wrapper')) return;
                             
                             if (selectedMessages.has(m.id)) {
                                 selectedMessages.delete(m.id);

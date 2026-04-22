@@ -5,6 +5,7 @@ const { autoUpdater } = require('electron-updater');
 let mainWindow = null;
 let loginWin = null;
 let filterActive = false;
+let tokenFound = false;
 
 // Configure autoUpdater
 autoUpdater.autoDownload = true;
@@ -49,6 +50,8 @@ ipcMain.on('window-max', () => {
 ipcMain.on('open-login-window', () => {
   if (!mainWindow || loginWin) return; // Prevent opening multiple windows
 
+  tokenFound = false;
+
   loginWin = new BrowserWindow({
     width: 500,
     height: 750,
@@ -79,7 +82,6 @@ ipcMain.on('open-login-window', () => {
   loginWin.loadURL('https://discord.com/login');
 
   const filter = { urls: ['https://discord.com/api/v*/users/@me*'] };
-  let tokenFound = false;
 
   // Safely use default session which never gets destroyed before app quit
   if (!filterActive) {
