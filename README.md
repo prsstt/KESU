@@ -36,7 +36,7 @@ Before you begin, ensure you have the following installed on your system:
 
 ### From Releases (Recommended)
 
-The easiest way to get started is to download the latest pre-built installer for your operating system from the project's [**Releases page**](https://github.com/sh0cky/KESU/releases).
+The easiest way to get started is to download the latest pre-built installer for your operating system from the project's [**Releases page**](https://github.com/prsstt/KESU/releases).
 
 ### From Source (For Developers)
 
