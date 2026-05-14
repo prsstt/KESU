@@ -3,7 +3,7 @@
 **Professional Discord Message Manager** -- Take full control of your digital footprint.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.1-brightgreen.svg)](https://github.com/prsstt/KESU/releases)
+[![Version](https://img.shields.io/badge/version-2.2.0-brightgreen.svg)](https://github.com/prsstt/KESU/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)]()
 [![Electron](https://img.shields.io/badge/electron-41.x-47848F.svg)](https://www.electronjs.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
