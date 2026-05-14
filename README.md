@@ -12,8 +12,7 @@
 
 KESU is a frameless Electron desktop application designed for auditing and erasing your Discord message history. It provides a unified workspace for managing messages across servers and direct conversations, with built-in rate limit handling, real-time preview, and a chronological audit log of all actions performed.
 
-<!-- PLACEHOLDER: Application demo video/GIF will be added here -->
-<!-- ![KESU Demo](docs/assets/demo.gif) -->
+![KESU Demo](docs/assets/kesu_demo.gif)
 
 ---
 
@@ -54,7 +53,7 @@ KESU is a frameless Electron desktop application designed for auditing and erasi
 
 ---
 
-## Screenshots
+<!-- ## Screenshots
 
 <!-- PLACEHOLDER: Screenshots of the application will be added here -->
 <!-- 
@@ -72,12 +71,12 @@ KESU is a frameless Electron desktop application designed for auditing and erasi
 
 ![Developer Console](docs/assets/screenshot_devmode.png)
 *Developer mode with live diagnostic console.*
--->
+
 
 > Screenshots and a video demonstration will be added in a future update.
 
 ---
-
+-->
 ## Architecture
 
 KESU follows a standard Electron architecture with a strict separation between the main process and the renderer:
