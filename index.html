@@ -1056,6 +1056,13 @@
                                     await window.discordApi.deleteMessage(authToken, cid, m.id);
                                     cCount++;
                                     addAuditRecord(m.id, m.content, `${info.context} > ${info.name}`);
+                                    
+                                    // Real-time UI update: remove bubble if it's currently in preview
+                                    if (currentPreviewChannel === cid) {
+                                        const el = document.querySelector(`.msg-bubble[data-id="${m.id}"]`);
+                                        if (el) el.remove();
+                                    }
+
                                     await new Promise(r => setTimeout(r, 1000 + Math.random() * 800));
                                 } catch(e) {
                                     if(e.status === 429) {
@@ -1072,6 +1079,11 @@
                 if (!stopRequested) {
                     sysLog(`Finished sweeping ${info.name}. Erased ${cCount} records.`);
                     globalSelection.delete(cid);
+                    
+                    // Visual cleanup for the processed target
+                    document.querySelectorAll(`.list-item[data-id="${cid}"] .cb`).forEach(cb => cb.classList.remove('checked'));
+                    document.querySelectorAll(`.chan-card[data-id="${cid}"]`).forEach(card => card.classList.remove('active'));
+                    
                     updateGlobalPurgeBtn();
                 }
             }
@@ -1080,6 +1092,13 @@
             isPurging = false;
             document.getElementById('btn-global-stop').style.display = 'none';
             document.getElementById('btn-global-purge').style.display = 'block';
+            
+            // Final comprehensive cleanup
+            const tempIsPurging = isPurging;
+            isPurging = false; // Temporarily ensure guard doesn't block it
+            deselectAllTargets();
+            isPurging = tempIsPurging;
+            
             updateGlobalPurgeBtn();
         }
     </script>
