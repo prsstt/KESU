@@ -159,6 +159,11 @@
         .audit-time { font-size: 11px; color: var(--danger); font-weight: 600; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Update Toast */
+        .update-toast { position: fixed; top: 0; left: 0; right: 0; z-index: 3000; background: linear-gradient(135deg, #0070f3, #0050c0); color: #fff; padding: 10px 20px; font-size: 12px; font-weight: 600; text-align: center; animation: slideDown 0.4s ease; display: none; -webkit-app-region: no-drag; letter-spacing: 0.3px; }
+        .update-toast.visible { display: block; }
 
         /* Console */
         .console { height: 140px; background: #000; border-top: 1px solid var(--border); padding: 15px 40px; font-family: "Fira Code", Consolas, monospace; font-size: 11px; color: #666; overflow-y: auto; display: none; flex-shrink: 0; }
@@ -175,6 +180,9 @@
     </style>
 </head>
 <body>
+
+    <!-- Update Notification Toast -->
+    <div class="update-toast" id="update-toast"></div>
 
     <div class="window-controls">
         <div class="win-btn" onclick="window.appControl.minimize()">
@@ -1100,6 +1108,20 @@
             isPurging = tempIsPurging;
             
             updateGlobalPurgeBtn();
+        }
+
+        // -- AUTO-UPDATER UI --
+        if (window.appControl && window.appControl.onUpdaterStatus) {
+            window.appControl.onUpdaterStatus((message) => {
+                sysLog(`[UPDATER] ${message}`);
+                const toast = document.getElementById('update-toast');
+                toast.textContent = message;
+                toast.classList.add('visible');
+                clearTimeout(toast._hideTimer);
+                toast._hideTimer = setTimeout(() => {
+                    toast.classList.remove('visible');
+                }, 8000);
+            });
         }
     </script>
 </body>

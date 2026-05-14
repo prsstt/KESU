@@ -56,5 +56,8 @@ contextBridge.exposeInMainWorld('appControl', {
     clearSession: () => { ipcRenderer.send('clear-session'); },
     onTokenCaptured: (callback) => { 
         ipcRenderer.on('token-captured', (event, token) => callback(token));
+    },
+    onUpdaterStatus: (callback) => {
+        ipcRenderer.on('updater-status', (event, message) => callback(message));
     }
 });
