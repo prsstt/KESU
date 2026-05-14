@@ -577,7 +577,7 @@
         // -- NAVIGATION --
         document.querySelectorAll('.nav-item').forEach(item => {
             item.onclick = () => {
-                if(!authToken || isPurging) return;
+                if(!authToken) return;
                 document.querySelector('.nav-item.active').classList.remove('active');
                 item.classList.add('active');
                 currentNavView = item.dataset.view;
