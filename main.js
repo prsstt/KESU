@@ -150,8 +150,11 @@ autoUpdater.on('update-available', (info) => {
 
 autoUpdater.on('update-downloaded', (info) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('updater-status', `Update v${info.version} downloaded. It will be installed on restart.`);
+    mainWindow.webContents.send('updater-status', `Update v${info.version} downloaded. Restarting in 3 seconds...`);
   }
+  setTimeout(() => {
+    autoUpdater.quitAndInstall();
+  }, 3000);
 });
 
 autoUpdater.on('error', (err) => {
