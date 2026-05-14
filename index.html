@@ -694,7 +694,6 @@
                     div.appendChild(textSpan);
                     
                     div.onclick = () => {
-                        if (isPurging) return;
                         document.querySelectorAll('.list-item.active-item').forEach(e => e.classList.remove('active-item'));
                         div.classList.add('active-item');
                         openPreview(item.id, name, "Direct Message");
@@ -702,7 +701,6 @@
                 } else {
                     div.textContent = name;
                     div.onclick = () => {
-                        if (isPurging) return;
                         document.querySelectorAll('.list-item.active-item').forEach(e => e.classList.remove('active-item'));
                         div.classList.add('active-item');
                         loadServerChannels(item.id, name);
@@ -745,12 +743,13 @@
                     `;
                     
                     card.onclick = (e) => {
-                        if (isPurging) return;
                         if(e.target.tagName === 'BUTTON') {
                             e.stopPropagation();
                             openPreview(chan.id, nameStr, guildName);
                             return;
                         }
+                        
+                        if (isPurging) return;
                         
                         if(globalSelection.has(chan.id)) {
                             globalSelection.delete(chan.id);
