@@ -1,6 +1,6 @@
 {
   "name": "kesu",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Professional Discord Message Manager",
   "main": "main.js",
   "scripts": {
